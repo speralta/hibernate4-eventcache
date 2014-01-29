@@ -184,58 +184,14 @@ class EventCache implements Map {
 		}
 
 		Object oldCopy = entityToCopyMap.put( entity, copy );
-		Boolean oldOperatedOn = entityToOperatedOnFlagMap.put( entity, isOperatedOn );
-		Object oldEntity = copyToEntityMap.put( copy, entity );
+	        entityToOperatedOnFlagMap.put(entity, isOperatedOn);
+	        copyToEntityMap.put(copy, entity);
 
-		if ( oldCopy == null ) {
-			if  ( oldEntity != null ) {
-				throw new IllegalStateException(
-						"Error occurred while storing entity " + printEntity( entity ) + ". An entity copy " + printEntity( copy )
-								+ " was already assigned to a different entity " + printEntity( oldEntity ) + "."
-				);
-			}
-			if ( oldOperatedOn != null ) {
-				throw new IllegalStateException(
-						"EventCache#entityToOperatedOnFlagMap contains an entity " + printEntity( entity )
-								+ ", but EventCache#entityToCopyMap does not."
-				);
-			}
-		}
-		else {
-			if ( oldCopy != copy ) {
-				// Replaced an entity copy with a new copy; need to remove the oldCopy from copyToEntityMap
-				// to synch things up.
-				Object removedEntity = copyToEntityMap.remove( oldCopy );
-				if ( removedEntity != entity ) {
-					throw new IllegalStateException(
-							"Error occurred while storing entity " + printEntity( entity ) + ". An unexpected entity " + printEntity( removedEntity )
-									+ " was associated with the old entity copy " + printEntity( oldCopy ) + "."
-					);
-				}
-				if ( oldEntity != null ) {
-					throw new IllegalStateException(
-							"Error occurred while storing entity " + printEntity( entity ) + ". A new entity copy " + printEntity( copy )
-									+ " is already associated with a different entity " + printEntity( oldEntity ) + "."
-					);
-				}
-			}
-			else {
-				// Replaced an entity copy with the same copy in entityToCopyMap.
-				// Make sure that copy is associated with the same entity in copyToEntityMap.
-				if ( oldEntity != entity ) {
-					throw new IllegalStateException(
-							"An entity copy " + printEntity( copy ) + " was associated with a different entity "
-									+ printEntity( oldEntity ) + " than provided " + printEntity( entity ) + "."
-					);
-				}
-			}
-			if ( oldOperatedOn == null ) {
-				throw new IllegalStateException(
-						"EventCache#entityToCopyMap contained an entity " + printEntity( entity )
-								+ ", but EventCache#entityToOperatedOnFlagMap did not."
-				);
-			}
-		}
+	        if ((oldCopy != null) && (oldCopy != copy)) {
+	            // Replaced an entity copy with a new copy; need to remove the
+	            // oldCopy from copyToEntityMap to synch things up.
+	            copyToEntityMap.remove(oldCopy);
+	        }
 
 		return oldCopy;
 	}
@@ -262,38 +218,11 @@ class EventCache implements Map {
 		if ( entity == null ) {
 			throw new NullPointerException( "null entities are not supported by " + getClass().getName() );
 		}
-		Boolean oldOperatedOn = entityToOperatedOnFlagMap.remove( entity );
-		Object oldCopy = entityToCopyMap.remove( entity );
-		Object oldEntity = oldCopy != null ? copyToEntityMap.remove( oldCopy ) : null;
-
-		if ( oldCopy == null ) {
-			if ( oldOperatedOn != null ) {
-				throw new IllegalStateException(
-						"Removed entity " + printEntity( entity )
-								+ " from EventCache#entityToOperatedOnFlagMap, but EventCache#entityToCopyMap did not contain the entity."
-				);
-			}
-		}
-		else {
-			if ( oldEntity == null ) {
-				throw new IllegalStateException(
-						"Removed entity " + printEntity( entity )
-								+ " from EventCache#entityToCopyMap, but EventCache#copyToEntityMap did not contain the entity."
-				);
-			}
-			if ( oldOperatedOn == null ) {
-				throw new IllegalStateException(
-						"EventCache#entityToCopyMap contained an entity " + printEntity( entity )
-								+ ", but EventCache#entityToOperatedOnFlagMap did not."
-				);
-			}
-			if ( oldEntity != entity ) {
-				throw new IllegalStateException(
-						"An entity copy " + printEntity( oldCopy ) + " was associated with a different entity "
-								+ printEntity( oldEntity ) + " than provided " + printEntity( entity ) + "."
-				);
-			}
-		}
+		entityToOperatedOnFlagMap.remove(entity);
+	        Object oldCopy = entityToCopyMap.remove(entity);
+	        if (oldCopy != null) {
+	            copyToEntityMap.remove(oldCopy);
+	        }
 
 		return oldCopy;
 	}
