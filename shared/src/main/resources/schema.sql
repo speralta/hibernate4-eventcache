@@ -1,0 +1,21 @@
+DROP ALL OBJECTS;
+
+CREATE TABLE USER (
+	ID int not null IDENTITY,
+	NAME VARCHAR(100) not null,
+	CURRENCY_ID int,
+	ACCOUNT_ID int,
+	VERSION int,
+	PRIMARY KEY (id)
+);
+CREATE TABLE ACCOUNT (
+	ID int not null IDENTITY,
+	NAME VARCHAR(100) not null,
+	CURRENCY_ID int,
+	PRIMARY KEY (id)
+);
+CREATE TABLE CURRENCY (
+	ID int not null IDENTITY,
+	NAME VARCHAR(100) not null,
+	PRIMARY KEY (id)
+);
